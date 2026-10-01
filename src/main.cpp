@@ -13,6 +13,7 @@
 #define SHINKU_PIN_1 D4
 #define SHINKU_PIN_2 D5
 #define SHINKU_PIN_3 D6
+#define DENJIBEN_PIN D7
 
 #define SLAVE1_WHEEL_CONTROL_ID 0x310    // タイヤ
 #define SLAVE2_DISHES_ARM_ID 0x710       // お皿
@@ -137,10 +138,10 @@ void motor_control(void *pvParameters)
       break;
 
     case 11:
-      MOTOR1.set_location(int(8192 * 36 * 3.3));
+      MOTOR1.set_location(int(8192 * 36 * 4));
       MOTOR3.set_location(8192 * 36 * -3);
       MOTOR2.set_location(8192 * 36 * -3);
-      while (abs((int(8192 * 36 * 3.3)) - MOTOR1.get_location()) > 5000 || abs((8192 * 36 * -3) - MOTOR2.get_location()) > 5000 || abs((8192 * 36 * -3) - MOTOR3.get_location()) > 5000)
+      while (abs((int(8192 * 36 * 4)) - MOTOR1.get_location()) > 5000 || abs((8192 * 36 * -3) - MOTOR2.get_location()) > 5000 || abs((8192 * 36 * -3) - MOTOR3.get_location()) > 5000)
         vTaskDelay(pdMS_TO_TICKS(1));
       vTaskDelay(pdMS_TO_TICKS(500));
       digitalWrite(SHINKU_PIN_1, HIGH);
@@ -150,9 +151,9 @@ void motor_control(void *pvParameters)
 
     case 12:
       // 例: Kp=1.5, Ki=0.0, Kd=0.1, 死区=0、最大速度を 50 に制限する場合
-      MOTOR1.set_location_pid(3.5, 0.0, 0.1, 0.0, 1000.0); // kp, ki, 死区, 最高速度
-      MOTOR2.set_location_pid(2.5, 0.0, 0.1, 0.0, 900.0);
-      MOTOR3.set_location_pid(2.5, 0.0, 0.1, 0.0, 900.0);
+      MOTOR1.set_location_pid(3.5, 0.0, 0.1, 0.0, 1800.0); // kp, ki, 死区, 最高速度
+      MOTOR2.set_location_pid(2.5, 0.0, 0.1, 0.0, 1900.0);
+      MOTOR3.set_location_pid(2.5, 0.0, 0.1, 0.0, 1900.0);
 
       MOTOR1.set_location(0);
       MOTOR2.set_location(8192 * 36 * -5);
@@ -177,6 +178,14 @@ void motor_control(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(1));
       break;
 
+    case 14:
+      digitalWrite(DENJIBEN_PIN, LOW);
+      break;
+
+    case 15:
+      digitalWrite(DENJIBEN_PIN, HIGH);
+      break;
+
     default:
       MOTOR1.set_speed(0);
       MOTOR2.set_speed(0);
@@ -195,6 +204,12 @@ void setup()
   pinMode(SHINKU_PIN_1, OUTPUT);
   pinMode(SHINKU_PIN_2, OUTPUT);
   pinMode(SHINKU_PIN_3, OUTPUT);
+  pinMode(DENJIBEN_PIN, OUTPUT);
+
+  digitalWrite(SHINKU_PIN_1, LOW);
+  digitalWrite(SHINKU_PIN_2, LOW);
+  digitalWrite(SHINKU_PIN_3, LOW);
+  digitalWrite(DENJIBEN_PIN, LOW);
 
   while (CAN_BUS.setup() != ESP_OK)
   {
@@ -209,9 +224,9 @@ void setup()
   MOTOR3.setup();
 
   // 例: Kp=1.5, Ki=0.0, Kd=0.1, 死区=0、最大速度を 50 に制限する場合
-  MOTOR1.set_location_pid(3.5, 0.0, 0.1, 0.0, 1800.0); // kp, ki, 死区, 最高速度
-  MOTOR2.set_location_pid(2.5, 0.0, 0.1, 0.0, 1900.0);
-  MOTOR3.set_location_pid(2.5, 0.0, 0.1, 0.0, 1900.0);
+  MOTOR1.set_location_pid(3.5, 0.0, 0.1, 0.0, 2400.0); // kp, ki, 死区, 最高速度
+  MOTOR2.set_location_pid(2.5, 0.0, 0.1, 0.0, 2500.0);
+  MOTOR3.set_location_pid(2.5, 0.0, 0.1, 0.0, 2500.0);
 
   /***********************************CAN関連********************************************/
   twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT_V2(1, (gpio_num_t)SLAVE_TX_PIN, (gpio_num_t)SLAVE_RX_PIN, TWAI_MODE_NORMAL);
