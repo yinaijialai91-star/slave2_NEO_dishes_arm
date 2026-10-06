@@ -139,9 +139,9 @@ void motor_control(void *pvParameters)
 
     case 11:
       MOTOR1.set_location(int(8192 * 36 * 4));
-      MOTOR3.set_location(8192 * 36 * -3);
+      MOTOR3.set_location(8192 * 36 * -2.5);
       MOTOR2.set_location(8192 * 36 * -3);
-      while (abs((int(8192 * 36 * 4)) - MOTOR1.get_location()) > 5000 || abs((8192 * 36 * -3) - MOTOR2.get_location()) > 5000 || abs((8192 * 36 * -3) - MOTOR3.get_location()) > 5000)
+      while (abs((int(8192 * 36 * 4)) - MOTOR1.get_location()) > 5000 || abs((8192 * 36 * -3) - MOTOR2.get_location()) > 5000 || abs((8192 * 36 * -2.5) - MOTOR3.get_location()) > 5000)
         vTaskDelay(pdMS_TO_TICKS(1));
       vTaskDelay(pdMS_TO_TICKS(500));
       digitalWrite(SHINKU_PIN_1, HIGH);
